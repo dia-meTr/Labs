@@ -1,0 +1,99 @@
+CREATE DATABASE Stage2;
+USE Stage2;
+
+
+CREATE TABLE IF NOT EXISTS Actors (
+  Id INT PRIMARY KEY,
+  Actor TEXT NOT NULL);
+
+
+CREATE TABLE IF NOT EXISTS Companies (
+  Id INT PRIMARY KEY,
+  Company TEXT NOT NULL);
+
+
+CREATE TABLE IF NOT EXISTS Countries (
+  Id INT PRIMARY KEY,
+  Country TEXT NOT NULL);
+  
+
+CREATE TABLE IF NOT EXISTS Directors (
+  Id INT PRIMARY KEY,
+  Director TEXT NOT NULL);
+
+
+CREATE TABLE IF NOT EXISTS Genres (
+  Id INT PRIMARY KEY,
+  Genre TEXT NULL DEFAULT NULL);
+
+
+CREATE TABLE IF NOT EXISTS Languages (
+  Id INT PRIMARY KEY,
+  Lang_code TEXT,
+  Lang_name TEXT NOT NULL,
+  Lang_native_name TEXT);
+
+
+CREATE TABLE IF NOT EXISTS Release_date (
+  Id INT PRIMARY KEY,
+  Premiere TEXT NOT NULL);
+
+
+CREATE TABLE IF NOT EXISTS Types (
+  Id INT PRIMARY KEY,
+  type TEXT NOT NULL);
+  
+  
+CREATE TABLE IF NOT EXISTS Films (
+  Id INT PRIMARY KEY,
+  Title TEXT NOT NULL,
+  Duration TEXT,
+  IMDBScore DOUBLE,
+  Type INT NOT NULL,
+  Company INT NOT NULL,
+  Premiere INT,
+  FOREIGN KEY (Type) REFERENCES Types(Id),
+  FOREIGN KEY (Company) REFERENCES Companies(Id),
+  FOREIGN KEY (Premiere) REFERENCES Release_date(Id)
+  );
+
+  
+CREATE TABLE IF NOT EXISTS Countries_to_films (
+  Id INT PRIMARY KEY,
+  Film INT NOT NULL,
+  Country INT NOT NULL,
+  FOREIGN KEY (Film) REFERENCES Films(Id),
+  FOREIGN KEY (Country) REFERENCES Countries(Id));
+
+
+CREATE TABLE IF NOT EXISTS Cast (
+  Id INT PRIMARY KEY,
+  Film INT NOT NULL,
+  Actor INT NOT NULL,
+  FOREIGN KEY (Film) REFERENCES Films(Id),
+  FOREIGN KEY (Actor) REFERENCES Actors(Id));
+
+
+CREATE TABLE IF NOT EXISTS Directors_to_films (
+  Id INT PRIMARY KEY,
+  Film INT NOT NULL,
+  Director INT NOT NULL,
+  FOREIGN KEY (Film) REFERENCES Films(Id),
+  FOREIGN KEY (Director) REFERENCES Directors(Id));
+
+
+CREATE TABLE IF NOT EXISTS Genres_to_films (
+  Id INT PRIMARY KEY,
+  Film INT NOT NULL,
+  Genre INT NOT NULL,
+  FOREIGN KEY (Film) REFERENCES Films(Id),
+  FOREIGN KEY (Genre) REFERENCES Genres(Id));
+
+
+CREATE TABLE IF NOT EXISTS Languages_to_films (
+  Id INT PRIMARY KEY,
+  Film INT NOT NULL,
+  Lang_name INT NOT NULL,
+  FOREIGN KEY (Film) REFERENCES Films(Id),
+  FOREIGN KEY (Lang_name) REFERENCES Languages(Id));
+
