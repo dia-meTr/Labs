@@ -46,6 +46,6 @@ if __name__ == '__main__':
     print(f'"{pat}"')
     print()
 
-    q = 101
+    q = 21
 
     search(pat, txt, q)
