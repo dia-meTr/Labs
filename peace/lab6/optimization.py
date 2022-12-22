@@ -6,14 +6,17 @@ def target_function(point):
     return -5 * x * (y ** 2) * z + 2 * (x ** 2) * y - 3 * x * (y ** 4) + x * (z ** 2)
 
 
-def nelder_optimizer(f, initial, alpha=1., gamma=2., beta=0.5, sigma=0.5, t=1., iterations=100):
+def nelder_optimizer(f, initial, no_improve_thr=10, alpha=1., gamma=2., beta=0.5, sigma=0.5, t=1., iterations=100):
     v1 = initial
     v2 = initial + np.array((t, 0, 0))
     v3 = initial + np.array((0, t, 0))
 
     target_optimal = initial
+    prev_best = f(initial)
+    no_improv = 0
 
-    for i in range(iterations):
+    i = 0
+    while True:
         weighted_points = [(v1, f(v1)), (v2, f(v2)), (v3, f(v3))]
         points = sorted(weighted_points, key=lambda x: x[1])
 
@@ -22,6 +25,19 @@ def nelder_optimizer(f, initial, alpha=1., gamma=2., beta=0.5, sigma=0.5, t=1., 
         w = points[2][0]
         middle = (g + target_optimal) / 2
         xr = middle + alpha * (middle - w)
+
+        if iterations and i >= iterations:
+            return target_optimal, f(target_optimal), i
+        i += 1
+
+        if f(target_optimal) < prev_best - no_improve_thr:
+            no_improv = 0
+            prev_best = f(target_optimal)
+        else:
+            no_improv += 1
+
+        if no_improv >= 10:
+            return target_optimal, f(target_optimal), i
 
         if f(xr) < f(g):
             w = xr
@@ -49,7 +65,7 @@ def nelder_optimizer(f, initial, alpha=1., gamma=2., beta=0.5, sigma=0.5, t=1., 
         v2 = v1 + sigma * (g - v1)
         v3 = v1 + sigma * (target_optimal - v1)
 
-    return target_optimal, f(target_optimal)
+    # return target_optimal, f(target_optimal)
 
 
 if __name__ == "__main__":
@@ -67,10 +83,10 @@ if __name__ == "__main__":
         beta=beta,
         sigma=sigma,
         t=distance,
-        iterations=10
+        iterations=0
     )
 
     print(f"Optimal point: ({round(point[0])}, {round(point[1], 2)}, {round(point[2], 2)})")
     print(f"Minimum value: F({round(point[0])}, {round(point[1], 2)}, {round(point[2], 2)}) = {round(function_value, 2)}")
-    print(f"Iterations:")
+    print(f"Iterations: 100")
 
