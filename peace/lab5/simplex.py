@@ -1,5 +1,7 @@
 import math
 import numpy as np
+from scipy.optimize import linprog
+
 
 
 def can_be_improved(tableau):
@@ -21,11 +23,11 @@ def propose_solution(tableau):
 
 
 def is_basic_solution(column):
-    return sum(column) == 1 and len([c for c in column if c == 0]) == len(column) - 1
+    return sum(column) == 1 and len([el for el in column if el == 0]) == len(column) - 1
 
 
 def pivot_step(tableau, pivot_position):
-    new_tableau = [[] for eq in tableau]
+    new_tableau = [[] for _ in tableau]
 
     i, j = pivot_position
     pivot_value = tableau[i][j]
@@ -52,20 +54,27 @@ def get_pivot(tabl):
     return row, column
 
 
-def to_table(c, A, b):
-    xb = [eq + [x] for eq, x in zip(A, b)]
+def to_table(c, a, b):
+    xb = [eq + [x] for eq, x in zip(a, b)]
     z = c + [0]
     return xb + [z]
 
 
-def simplex(z_coef, matrix, b):
-    table_form = to_table(z_coef, matrix, b)
+def simplex(z_coefficient, matrix, b):
+    table_form = to_table(z_coefficient, matrix, b)
 
     while can_be_improved(table_form):
         pivot = get_pivot(table_form)
         table_form = pivot_step(table_form, pivot)
 
     return propose_solution(table_form)
+
+
+def get_f_value(c, x):
+    res = 0
+    for i in range(len(c)):
+        res += c[i] * x[i]
+    return res
 
 
 c1 = [-2, 0, 1, -1, -2]
@@ -78,5 +87,8 @@ b1 = [5, 3, 8]
 
 result = simplex(c1, A1, b1)
 
+
 for idx, x_value in enumerate(result):
     print(f'x_{idx} = {x_value}')
+
+print(f'f={get_f_value(c1, result)}')
