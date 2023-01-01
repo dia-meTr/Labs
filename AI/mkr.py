@@ -40,6 +40,9 @@ class GeneticEngine:
         return sum(scores) / len(scores)
 
     def crossover(self, father, mother):
+        # Алгоритм створює нову популяцію шляхом кроссоверу між двома випадковими представниками та мутацією.
+        # Кроссовер відбувається випадковим перемішуванням зміщень та вагів нейромереж.
+
         nn = copy.deepcopy(father)
 
         for _ in range(self.nets[0].bias_nitem):
@@ -55,6 +58,7 @@ class GeneticEngine:
         return nn
 
     def mutation(self, child):
+        # Мутація відбувається шляхом додавання випадкових змінних до зміщень та вагів нейромереж.
         nn = copy.deepcopy(child)
 
         for _ in range(self.nets[0].bias_nitem):
@@ -69,6 +73,7 @@ class GeneticEngine:
         return nn
 
     def run(self):
+        # На кожній ітерації циклу:
         score_list = list(zip(self.nets, self.all_scores()))
         score_list.sort(key=lambda x: x[1])
         score_list = [obj[0] for obj in score_list]
@@ -79,6 +84,8 @@ class GeneticEngine:
         for _ in range(random.randint(0, retain_non_best)):
             score_list_top.append(random.choice(score_list[retain_num:]))
 
+
+        # Також обираємо кілька представників з поганою точністю для уникнення локальних максимумів
         while len(score_list_top) < self.population_size:
             father = random.choice(score_list_top)
             mother = random.choice(score_list_top)
@@ -119,22 +126,21 @@ class NeuralNetwork(object):
 def main():
     # Generate our data 2-6-7-8-7-6-1
     # Function is z = x * cos(x + y)
-    #
+
     X = np.random.rand(1000, 2)
     y = X[:, 0] * np.sin(X[:, 0] + X[:, 1])
+
     POPULATION = 30
     LAYERS = [2, 6, 7, 8, 7, 6, 1]
     MUTATION_RATE = 0.2
     CROSSOVER_RATE = 0.5
-    RETAIN_RATE = 0.4
+    RETAIN_RATE = 0.40
+
     engine = GeneticEngine(POPULATION, LAYERS, MUTATION_RATE, CROSSOVER_RATE, RETAIN_RATE, X, y)
-    start_time = time.time()
 
     for i in range(1000):
-        elapsed = timedelta(seconds=time.time() - start_time)
         min = engine.min_score()
-        avg = engine.avg_score()
-        print(f"Iteration #{i:<3} | Elapsed: {elapsed} | Min score:{min:.5f} | Avg score: {avg:.5f}")
+        print(f"Iteration {i:<3} {min:.5f} ")
 
         engine.run()
 
